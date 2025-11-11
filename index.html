@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор стоимости бухгалтерского обслуживания</title>
+    <style>
+        :root {
+            --color-bg-1: #ff6b6b;
+            --color-bg-2: #4ecdc4;
+            --color-bg-3: #ffe66d;
+            --color-bg-4: #a8e6cf;
+            --color-bg-5: #ff8b94;
+            --color-bg-6: #c7ceea;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #4facfe 60%, #00f2fe 80%, #43e97b 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 28px;
+        }
+
+        .form-section:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, #ff6b6b, #4ecdc4);
+            margin-right: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border: 2px solid #667eea;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
+        select:hover, input[type="number"]:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox-item .price-tag {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #ffe66d 100%);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            margin-top: 25px;
+            animation: buttonGradient 3s ease infinite;
+        }
+
+        @keyframes buttonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .calculate-btn:hover {
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            color: #333;
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            display: none;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .result-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .result-price {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #ffe66d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+
+        .result-details {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(78, 205, 196, 0.05) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #555;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-card {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .result-price {
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💼 Калькулятор стоимости бухгалтерских услуг ИП Авдеева А.А.</h1>
+            <p>Рассчитайте стоимость за 1 минуту</p>
+        </div>
+
+        <div class="calculator-card">
+            <form id="calcForm">
+                <div class="form-section">
+                    <div class="section-title">Основные параметры</div>
+                    
+                    <div class="input-group">
+                        <label for="orgType">Организационно-правовая форма</label>
+                        <select id="orgType" onchange="updateTaxOptions()">
+                            <option value="ip_no_employees">ИП без работников</option>
+                            <option value="ip_with_employees">ИП с работниками</option>
+                            <option value="ooo">ООО</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="taxSystem">Система налогообложения</label>
+                        <select id="taxSystem">
+                            <option value="usn_income">УСН Доходы</option>
+                            <option value="usn_income_expense">УСН Доходы - Расходы</option>
+                            <option value="psn_zero">ПСН + нулевка</option>
+                            <option value="osn">ОСН</option>
+                            <option value="usn_income_psn">УСН Доходы + ПСН</option>
+                            <option value="usn_income_expense_psn">УСН Доходы - Расходы + ПСН</option>
+                            <option value="osn_psn">ОСН + ПСН</option>
+                        </select>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="vat57">
+                        <label for="vat57">НДС 5/7%</label>
+                        <span class="price-tag">+20%</span>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="vat01022">
+                        <label for="vat01022">НДС 0/10/22%</label>
+                        <span class="price-tag">+70%</span>
+                    </div>
+
+                    <div class="input-group" id="employeesGroup" style="display: none;">
+                        <label for="employeesRF">Работники - граждане РФ</label>
+                        <input type="number" id="employeesRF" min="0" max="100" value="0" placeholder="Количество">
+                    </div>
+
+                    <div class="input-group" id="employeesForeignGroup" style="display: none;">
+                        <label for="employeesForeignNoPatent">Работники - иностранцы без патента</label>
+                        <input type="number" id="employeesForeignNoPatent" min="0" max="100" value="0" placeholder="Количество">
+                    </div>
+
+                    <div class="input-group" id="employeesForeignPatentGroup" style="display: none;">
+                        <label for="employeesForeignPatent">Работники - иностранцы с патентом</label>
+                        <input type="number" id="employeesForeignPatent" min="0" max="100" value="0" placeholder="Количество">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Дополнительные услуги</div>
+                    
+                    <div class="checkbox-group">
+                        <div class="input-group">
+                            <label for="extraAccountCount">Дополнительный р/с - количество</label>
+                            <input type="number" id="extraAccountCount" min="0" value="0" placeholder="Количество расчетных счетов">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="kktCount">ККТ (онлайн-касса) - количество</label>
+                            <input type="number" id="kktCount" min="0" value="0" placeholder="Количество касс">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="tradeAcquiringCount">Торговый эквайринг - количество</label>
+                            <input type="number" id="tradeAcquiringCount" min="0" value="0" placeholder="Количество">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="internetAcquiringCount">Интернет-эквайринг - количество</label>
+                            <input type="number" id="internetAcquiringCount" min="0" value="0" placeholder="Количество">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="extraPatentCount">Дополнительный патент - количество</label>
+                            <input type="number" id="extraPatentCount" min="0" value="0" placeholder="Количество патентов">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="municipalContractCount">Муниципальный контракт - количество</label>
+                            <input type="number" id="municipalContractCount" min="0" value="0" placeholder="Количество контрактов">
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-top: 25px;">Первичные документы</div>
+                    
+                    <div class="input-group">
+                        <label for="ppDocs">Платежные поручения кроме бюджетных (делает бухгалтер, количество в месяц)</label>
+                        <input type="number" id="ppDocs" min="0" value="0" placeholder="Количество документов">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="receiptDocs">Поступления (вносит бухгалтер, количество в месяц)</label>
+                        <input type="number" id="receiptDocs" min="0" value="0" placeholder="Не более 10 позиций номенклатуры">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="salesDocsClient">Реализации (вносит клиент, количество в месяц)</label>
+                        <input type="number" id="salesDocsClient" min="0" value="0" placeholder="Количество документов">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="salesDocsOutsource">Реализации (делает бухгалтер, количество в месяц)</label>
+                        <input type="number" id="salesDocsOutsource" min="0" value="0" placeholder="Количество документов">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="advanceReports">Авансовые отчеты (количество в месяц)</label>
+                        <input type="number" id="advanceReports" min="0" value="0" placeholder="Количество документов">
+                    </div>
+                </div>
+
+                <div class="form-section" id="hrSection" style="display: none;">
+                    <div class="section-title">Кадровые мероприятия и миграционный учет</div>
+                    
+                    <div class="input-group">
+                        <label for="employeeHiring">Прием сотрудника</label>
+                        <input type="number" id="employeeHiring" min="0" value="0" placeholder="Количество">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="employeeFiring">Увольнение сотрудника</label>
+                        <input type="number" id="employeeFiring" min="0" value="0" placeholder="Количество">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="foreignNotification">Уведомление о заключении/расторжении трудового договора с иностранным гражданином</label>
+                        <input type="number" id="foreignNotification" min="0" value="0" placeholder="Количество">
+                    </div>
+                </div>
+
+                <button type="button" class="calculate-btn" onclick="calculate()">
+                    🧮 Рассчитать стоимость
+                </button>
+            </form>
+        </div>
+
+        <div class="result-card" id="resultCard">
+            <div class="result-label">Стоимость бухгалтерского обслуживания:</div>
+            <div class="result-price" id="resultPrice">0 ₽</div>
+            <div class="result-details" id="resultDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        // Прайс-лист на основе таблицы
+        const pricing = {
+            ip_no_employees: {
+                'usn_income': 6000,
+                'usn_income_expense': 8400,
+                'psn_zero': 7200,
+                'osn': 10800,
+                'usn_income_psn': 9000,
+                'usn_income_expense_psn': 11400,
+                'osn_psn': 13200
+            },
+            ip_with_employees: {
+                'usn_income': 12000,
+                'usn_income_expense': 16800,
+                'psn_zero': 14400,
+                'osn': 21600,
+                'usn_income_psn': 18000,
+                'usn_income_expense_psn': 22800,
+                'osn_psn': 26400
+            },
+            ooo: {
+                'usn_income': 18000,
+                'usn_income_expense': 25200,
+                'osn': 32400
+            }
+        };
+
+        const taxNames = {
+            'usn_income': 'УСН Доходы',
+            'usn_income_expense': 'УСН Доходы - Расходы',
+            'psn_zero': 'ПСН + нулевка',
+            'osn': 'ОСН',
+            'usn_income_psn': 'УСН Доходы + ПСН',
+            'usn_income_expense_psn': 'УСН Доходы - Расходы + ПСН',
+            'osn_psn': 'ОСН + ПСН'
+        };
+
+        function updateTaxOptions() {
+            const orgType = document.getElementById('orgType').value;
+            const taxSystem = document.getElementById('taxSystem');
+            const employeesGroup = document.getElementById('employeesGroup');
+            const employeesForeignGroup = document.getElementById('employeesForeignGroup');
+            const employeesForeignPatentGroup = document.getElementById('employeesForeignPatentGroup');
+            const hrSection = document.getElementById('hrSection');
+            
+            // Показываем/скрываем поля работников и кадровые мероприятия
+            if (orgType === 'ip_with_employees') {
+                employeesGroup.style.display = 'block';
+                employeesForeignGroup.style.display = 'block';
+                employeesForeignPatentGroup.style.display = 'block';
+                hrSection.style.display = 'block';
+            } else {
+                employeesGroup.style.display = 'none';
+                employeesForeignGroup.style.display = 'none';
+                employeesForeignPatentGroup.style.display = 'none';
+                hrSection.style.display = 'none';
+            }
+            
+            // Обновляем опции налогообложения
+            taxSystem.innerHTML = '';
+            const availableTaxes = pricing[orgType];
+            
+            for (const [key, value] of Object.entries(availableTaxes)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = taxNames[key];
+                taxSystem.appendChild(option);
+            }
+        }
+
+        function calculate() {
+            const orgType = document.getElementById('orgType').value;
+            const taxSystem = document.getElementById('taxSystem').value;
+            
+            let details = [];
+            let totalPrice = 0;
+
+            // Базовая цена
+            const basePrice = pricing[orgType][taxSystem];
+            totalPrice = basePrice;
+            
+            const orgTypeNames = {
+                'ip_no_employees': 'ИП без работников',
+                'ip_with_employees': 'ИП с работниками',
+                'ooo': 'ООО'
+            };
+            
+            details.push({ 
+                label: `${orgTypeNames[orgType]}, ${taxNames[taxSystem]}`, 
+                value: `${basePrice.toLocaleString('ru-RU')} ₽` 
+            });
+
+            // Работники (только для ИП с работниками)
+            if (orgType === 'ip_with_employees') {
+                const employeesRF = parseInt(document.getElementById('employeesRF').value) || 0;
+                const employeesForeignNoPatent = parseInt(document.getElementById('employeesForeignNoPatent').value) || 0;
+                const employeesForeignPatent = parseInt(document.getElementById('employeesForeignPatent').value) || 0;
+                
+                if (employeesRF > 0) {
+                    const cost = employeesRF * 1000;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `Работники РФ (${employeesRF} чел.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+                
+                if (employeesForeignNoPatent > 0) {
+                    const cost = employeesForeignNoPatent * 1000;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `Иностранцы без патента (${employeesForeignNoPatent} чел.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+                
+                if (employeesForeignPatent > 0) {
+                    const cost = employeesForeignPatent * 1500;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `Иностранцы с патентом (${employeesForeignPatent} чел.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+            }
+
+            // НДС 5/7% (добавляет 20% к базовой стоимости)
+            let vat57Amount = 0;
+            if (document.getElementById('vat57').checked && (orgType === 'ip_no_employees' || orgType === 'ip_with_employees')) {
+                vat57Amount = Math.round(basePrice * 0.2);
+                totalPrice += vat57Amount;
+                details.push({ 
+                    label: 'НДС 5/7% (20% от базовой стоимости)', 
+                    value: `+${vat57Amount.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            // НДС 0/10/22% (70% от базовой ставки)
+            if (document.getElementById('vat01022').checked && (orgType === 'ip_no_employees' || orgType === 'ip_with_employees')) {
+                const vat01022Amount = Math.round(basePrice * 0.7);
+                totalPrice += vat01022Amount;
+                details.push({ 
+                    label: 'НДС 0/10/22%', 
+                    value: `+${vat01022Amount.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            // Дополнительные услуги с количеством
+            const extraAccountCount = parseInt(document.getElementById('extraAccountCount').value) || 0;
+            if (extraAccountCount > 0) {
+                const cost = extraAccountCount * 2000;
+                totalPrice += cost;
+                details.push({ 
+                    label: `Дополнительный р/с (${extraAccountCount} шт.)`, 
+                    value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            const kktCount = parseInt(document.getElementById('kktCount').value) || 0;
+            if (kktCount > 0) {
+                const cost = kktCount * 2000;
+                totalPrice += cost;
+                details.push({ 
+                    label: `ККТ (${kktCount} шт.)`, 
+                    value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            const tradeAcquiringCount = parseInt(document.getElementById('tradeAcquiringCount').value) || 0;
+            if (tradeAcquiringCount > 0) {
+                const cost = tradeAcquiringCount * 2000;
+                totalPrice += cost;
+                details.push({ 
+                    label: `Торговый эквайринг (${tradeAcquiringCount} шт.)`, 
+                    value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            const internetAcquiringCount = parseInt(document.getElementById('internetAcquiringCount').value) || 0;
+            if (internetAcquiringCount > 0) {
+                const cost = internetAcquiringCount * 1000;
+                totalPrice += cost;
+                details.push({ 
+                    label: `Интернет-эквайринг (${internetAcquiringCount} шт.)`, 
+                    value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            const extraPatentCount = parseInt(document.getElementById('extraPatentCount').value) || 0;
+            if (extraPatentCount > 0) {
+                const cost = extraPatentCount * 2000;
+                totalPrice += cost;
+                details.push({ 
+                    label: `Дополнительный патент (${extraPatentCount} шт.)`, 
+                    value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            const municipalContractCount = parseInt(document.getElementById('municipalContractCount').value) || 0;
+            if (municipalContractCount > 0) {
+                const cost = municipalContractCount * 3000;
+                totalPrice += cost;
+                details.push({ 
+                    label: `Муниципальный контракт (${municipalContractCount} шт.)`, 
+                    value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                });
+            }
+
+            // Первичные документы
+            const docs = [
+                { id: 'ppDocs', label: 'Платежные поручения кроме бюджетных', price: 200 },
+                { id: 'receiptDocs', label: 'Поступления (бухгалтер)', price: 300 },
+                { id: 'salesDocsClient', label: 'Реализации (клиент)', price: 300 },
+                { id: 'salesDocsOutsource', label: 'Реализации (бухгалтер)', price: 500 },
+                { id: 'advanceReports', label: 'Авансовые отчеты', price: 500 }
+            ];
+
+            docs.forEach(doc => {
+                const count = parseInt(document.getElementById(doc.id).value) || 0;
+                if (count > 0) {
+                    const cost = count * doc.price;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `${doc.label} (${count} шт.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+            });
+
+            // Кадровые мероприятия (только для ИП с работниками)
+            if (orgType === 'ip_with_employees') {
+                const employeeHiring = parseInt(document.getElementById('employeeHiring').value) || 0;
+                if (employeeHiring > 0) {
+                    const cost = employeeHiring * 2000;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `Прием сотрудника (${employeeHiring} шт.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+
+                const employeeFiring = parseInt(document.getElementById('employeeFiring').value) || 0;
+                if (employeeFiring > 0) {
+                    const cost = employeeFiring * 2000;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `Увольнение сотрудника (${employeeFiring} шт.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+
+                const foreignNotification = parseInt(document.getElementById('foreignNotification').value) || 0;
+                if (foreignNotification > 0) {
+                    const cost = foreignNotification * 1500;
+                    totalPrice += cost;
+                    details.push({ 
+                        label: `Уведомление по иностранным гражданам (${foreignNotification} шт.)`, 
+                        value: `+${cost.toLocaleString('ru-RU')} ₽` 
+                    });
+                }
+            }
+
+            // Выводим результат
+            document.getElementById('resultPrice').textContent = 
+                totalPrice.toLocaleString('ru-RU') + ' ₽/мес';
+
+            let detailsHTML = '';
+            details.forEach(detail => {
+                detailsHTML += `
+                    <div class="detail-row">
+                        <span class="detail-label">${detail.label}</span>
+                        <span class="detail-value">${detail.value}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('resultDetails').innerHTML = detailsHTML;
+
+            const resultCard = document.getElementById('resultCard');
+            resultCard.classList.add('show');
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTaxOptions();
+        });
+
+        // Автоматический пересчёт
+        document.getElementById('calcForm').addEventListener('change', function() {
+            const resultCard = document.getElementById('resultCard');
+            if (resultCard.classList.contains('show')) {
+                calculate();
+            }
+        });
+    </script>
+</body>
+</html>
+
